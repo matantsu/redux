@@ -1,18 +1,28 @@
+import { CounterActions } from './store/counter/actions';
+import { AppState } from './store/store';
 import { Component } from '@angular/core';
-
-import { ApiService } from './shared';
+import { select } from 'ng2-redux';
+import { Observable } from 'rxjs';
 
 import '../style/app.scss';
 
 @Component({
-  selector: 'my-app', // <my-app></my-app>
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: 'my-app',
+  templateUrl: `
+    <counter [counter]="counter$ | async" (increment)="increment()" (decrement)="decrement()"></counter>
+  `,
+  styles: [],
 })
 export class AppComponent {
-  url = 'https://github.com/preboot/angular2-webpack';
+  @select((state: AppState) => state.counter.value) counter$: Observable<number>;
 
-  constructor(private api: ApiService) {
-    // Do something with api
+  constructor(private counterActions: CounterActions) {}
+
+  increment() {
+    this.counterActions.increment();
+  }
+
+  decrement() {
+    this.counterActions.decrement();
   }
 }

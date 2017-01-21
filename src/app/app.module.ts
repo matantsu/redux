@@ -1,13 +1,13 @@
+import { CounterComponent } from './components/counter.componnent';
+import { CounterActions } from './store/counter/actions';
+import { rootReducer, initialState, AppState } from './store/store';
 import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-import { ApiService } from './shared';
-import { routing } from './app.routing';
+import {NgReduxModule , NgRedux, DevToolsExtension} from 'ng2-redux';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
@@ -16,20 +16,32 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     BrowserModule,
     HttpModule,
     FormsModule,
-    routing
+    NgReduxModule
   ],
   declarations: [
     AppComponent,
-    HomeComponent,
-    AboutComponent
+    CounterComponent
   ],
   providers: [
-    ApiService
+    CounterActions
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(public appRef: ApplicationRef) {}
+  constructor(private appRef: ApplicationRef,
+              private ngRedux: NgRedux<AppState>,
+              private devTools: DevToolsExtension) {
+
+    let middlewares = [];
+    let enhancers = [];
+
+    if (devTools.isEnabled()) {
+      enhancers = [ ...enhancers, devTools.enhancer() ];
+    }
+
+    ngRedux.configureStore(rootReducer, initialState, middlewares, enhancers);
+  }
+
   hmrOnInit(store) {
     console.log('HMR store', store);
   }
